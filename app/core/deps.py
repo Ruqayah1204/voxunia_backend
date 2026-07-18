@@ -1,0 +1,58 @@
+"""T
+    his module contains dependencies for FastAPI 
+    routes, including user authentication and database 
+    session management.
+"""
+
+
+import uuid
+
+from fastapi import Depends, HTTPException, Header, status
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError
+from sqlalchemy.orm import Session as DBSession
+
+from app.core.security import decode_access_token
+from app.db.session import get_db
+from app.models.user import User
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/auth/login")
+
+
+def get_current_user(
+        token: str = Depends(oauth2_scheme),
+        db: DBSession = Depends(get_db),
+) -> User:
+    credentials_exeption = HTTPException(
+        status_code = status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate" : "Bearer"}
+    )
+    try:
+        payload = decode_access_token(token)
+        user_id = payload.get("sub")
+        if user_id is None:
+            raise credentials_exeption
+    except JWTError:
+        raise credentials_exeption
+    
+    user = db.query(User).filter(User.id == uuid.UUID(user_id)).first()
+    if user is None:
+        raise credentials_exeption
+    return user
+
+
+
+def get_current_user_optional(
+    authorization: str | None = Header(default=None),
+    db: DBSession = Depends(get_db),
+) -> User | None:
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization.removeprefix("Bearer ")
+    try:
+        payload = decode_access_token(token)
+        user_id = payload.get("sub")
+        return db.query(User).filter(User.id == uuid.UUID(user_id)).first()
+    except (JWTError, ValueError):
+        return None
