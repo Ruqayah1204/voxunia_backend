@@ -5,7 +5,7 @@ def _signup_and_login(client, email="rukky@example.com"):
     )
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": email, "password": "testpass123"},
+        json={"email": email, "password": "testpass123"},
     )
     token = response.json()["access_token"]
     return {"Authorization": f"Bearer {token}"}

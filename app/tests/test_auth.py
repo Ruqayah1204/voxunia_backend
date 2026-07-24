@@ -28,7 +28,7 @@ def test_login_returns_token(client):
     )
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": "rukky@example.com", "password": "testpass123"},  # note: form data, not json
+        json={"email": "rukky@example.com", "password": "testpass123"},  # note: json, not form data
     )
     assert response.status_code == 200
     assert "access_token" in response.json()
@@ -41,5 +41,5 @@ def test_login_rejects_wrong_password(client):
     )
     response = client.post(
         "/api/v1/auth/login",
-        data={"username": "rukky@example.com", "password": "wrongpassword"},
+        json={"email": "rukky@example.com", "password": "wrongpassword"},
     )
