@@ -23,6 +23,7 @@ from app.schemas.session import (
 
 router = APIRouter(tags=["Sessions"])
 
+# Helper function to generate a unique join code for a session
 def generate_join_code(db: DBSession) -> str:
     alphabet = string.ascii_uppercase + string. digits
     while True:
@@ -30,7 +31,7 @@ def generate_join_code(db: DBSession) -> str:
         if not db.query(SessionModel).filter(SessionModel.join_code == code).first():
             return code
 
-
+# API endpoint to create a new session for a specific group
 @router.post("/groups/{group_id}/sessions", response_model=SessionResponse, status_code=201)
 def create_session(
     group_id: uuid.UUID,
@@ -54,6 +55,22 @@ def create_session(
     db.refresh(session_obj)
     return session_obj
 
+
+# API endpoint to retrieve all sessions for a specific group
+@router.get("/groups/{group_id}/sessions", response_model=list[SessionResponse])
+def get_sessions_for_group(
+    group_id: uuid.UUID,
+    db: DBSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    group = db.query(Group).filter(Group.id == group_id, Group.organizer_id == current_user.id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    
+    sessions = db.query(SessionModel).filter(SessionModel.group_id == group.id).all()
+    return sessions
+
+# API endpoint to preview a session using its join code
 @router.get("/sessions/preview/{join_code}", response_model=SessionPreview)
 def preview_session(join_code: str, db: DBSession = Depends(get_db)):
     session_obj = db.query(SessionModel).filter(SessionModel.join_code == join_code).first()
