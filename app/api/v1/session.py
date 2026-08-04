@@ -88,6 +88,8 @@ def preview_session(join_code: str, db: DBSession = Depends(get_db)):
         live_attendee_count=live_count,
     )
 
+
+# API to join a session using its ID and an optional display name
 @router.post("/sessions/{session_id}/join", response_model=AttendeeJoinResponse)
 def join_session(
     session_id: uuid.UUID,
@@ -113,7 +115,7 @@ def join_session(
         display_name=attendee.display_name,
     )
 
-
+# API endpoint to start a session, changing its status to "live"
 @router.patch("/sessions/{session_id}/start", response_model=SessionResponse)
 def start_session(
     session_id: uuid.UUID,
@@ -130,8 +132,12 @@ def start_session(
         raise HTTPException(status_code=404, detail="Session not found")
     if session_obj.status != SessionStatus.upcoming:
         raise HTTPException(status_code=400, detail="Only an upcoming session can be started")
+    if session_obj.status == SessionStatus.ended:
+        raise HTTPException(status_code=400, detail="This session has already ended")
 
     session_obj.status = SessionStatus.live
+    session_obj.starts_at = datetime.now(timezone.utc)
+
     db.commit()
     db.refresh(session_obj)
     return session_obj
