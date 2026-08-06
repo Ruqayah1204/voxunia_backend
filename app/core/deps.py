@@ -16,7 +16,7 @@ from app.core.security import decode_access_token
 from app.db.session import get_db
 from app.models.user import User
 
-security = HTTPBearer()
+security = HTTPBearer(auto_error=False)
 # oauth2_scheme = HTTPBearer()
 
 
@@ -45,14 +45,13 @@ def get_current_user(
 
 
 def get_current_user_optional(
-    authorization: str | None = Header(default=None),
+    token: HTTPAuthorizationCredentials | None = Depends(security),
     db: DBSession = Depends(get_db),
 ) -> User | None:
-    if not authorization or not authorization.startswith("Bearer "):
+    if token is None:
         return None
-    token = authorization.removeprefix("Bearer ")
     try:
-        payload = decode_access_token(token)
+        payload = decode_access_token(token.credentials)
         user_id = payload.get("sub")
         return db.query(User).filter(User.id == uuid.UUID(user_id)).first()
     except (JWTError, ValueError):
