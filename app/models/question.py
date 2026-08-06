@@ -26,6 +26,7 @@ class Question(Base):
     status = Column(Enum(QuestionStatus), default=QuestionStatus.visible, nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
+# Relationships - this is where we define how the Question model relates to other models in the database. Each question belongs to a session and an attendee, and can have many votes and comments associated with it.
     session = relationship("Session", back_populates="questions")
     attendee = relationship("Attendee")
     votes = relationship("Vote", back_populates="question", cascade="all, delete-orphan")

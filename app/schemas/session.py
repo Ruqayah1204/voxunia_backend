@@ -25,6 +25,22 @@ class SessionResponse(BaseModel):
     class Config:
         from_attributes = True
 
+class SessionDetailResponse(BaseModel):
+    id: uuid.UUID
+    group_id: uuid.UUID
+    title: str
+    join_code: str
+    status: SessionStatus
+    visibility: SessionVisibility
+    starts_at: datetime | None
+    ends_at: datetime | None
+    live_attendee_count: int
+    total_question_count: int
+    total_vote_count: int
+
+    class Config:
+        from_attributes = True
+
 
 class SessionPreview(BaseModel):
     session_id: uuid.UUID
