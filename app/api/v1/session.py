@@ -140,6 +140,7 @@ def preview_session(join_code: str, db: DBSession = Depends(get_db)):
         title=session_obj.title,
         status=session_obj.status,
         live_attendee_count=live_count,
+        starts_at=session_obj.starts_at
     )
 
 

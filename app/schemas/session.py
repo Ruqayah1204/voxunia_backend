@@ -47,6 +47,7 @@ class SessionPreview(BaseModel):
     title: str
     status: SessionStatus
     live_attendee_count: int
+    starts_at: datetime | None
 
 
 class AttendeeJoinRequest(BaseModel):

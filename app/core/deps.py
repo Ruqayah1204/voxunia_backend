@@ -1,5 +1,5 @@
-"""T
-    his module contains dependencies for FastAPI 
+"""
+    This module contains dependencies for FastAPI 
     routes, including user authentication and database 
     session management.
 """
