@@ -17,6 +17,7 @@ class QuestionResponse(BaseModel):
     status: QuestionStatus
     display_name: str | None
     created_at: datetime
+    my_vote: int | None = None
 
     class Config:
         from_attributes = True
