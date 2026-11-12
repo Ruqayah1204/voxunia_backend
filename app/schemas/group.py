@@ -24,9 +24,10 @@ class GroupResponse(BaseModel):
     virtual_link: str | None
     created_at: datetime
 
-    total_session_count: int | None = None
-    total_attendee_count: int | None = None
-    total_question_count: int | None = None
+    total_session_count: int = 0
+    total_attendee_count: int = 0
+    total_question_count: int = 0
+    total_vote_count: int = 0
 
     class Config:
         from_attributes = True
