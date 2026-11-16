@@ -17,6 +17,7 @@ from app.models.question import Question
 from app.models.vote import Vote
 from app.models.session import Session as SessionModel, SessionStatus
 from app.models.user import User
+from app.websocket.manager import manager
 from app.schemas.session import (
     AttendeeJoinRequest,
     AttendeeJoinResponse,
@@ -172,7 +173,7 @@ def join_session(
 
 # API endpoint to start a session, changing its status to "live"
 @router.patch("/sessions/{session_id}/start", response_model=SessionResponse)
-def start_session(
+async def start_session(
     session_id: uuid.UUID,
     db: DBSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
@@ -195,10 +196,11 @@ def start_session(
 
     db.commit()
     db.refresh(session_obj)
+    await manager.broadcast(str(session_id), {"type": "session_started"})
     return session_obj
 
 @router.patch("/sessions/{session_id}/end", response_model=SessionResponse)
-def end_session(
+async def end_session(
     session_id: uuid.UUID,
     db: DBSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -216,4 +218,5 @@ def end_session(
     session_obj.ends_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(session_obj)
+    await manager.broadcast(str(session_id), {"type": "session_ended"})
     return session_obj
