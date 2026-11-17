@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.v1 import auth, groups, session, questions, comments
+from app.api.v1 import auth, groups, session, questions, comments, dashboard
 from app.core.config import settings
 from app.websocket.routes import router as ws_router
 
@@ -25,6 +25,7 @@ app.include_router(groups.router, prefix="/api/v1")
 app.include_router(session.router, prefix="/api/v1")
 app.include_router(questions.router, prefix="/api/v1")
 app.include_router(comments.router, prefix="/api/v1")
+app.include_router(dashboard.router, prefex="/api/v1")
 app.include_router(ws_router)
 
 
