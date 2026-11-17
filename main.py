@@ -25,7 +25,7 @@ app.include_router(groups.router, prefix="/api/v1")
 app.include_router(session.router, prefix="/api/v1")
 app.include_router(questions.router, prefix="/api/v1")
 app.include_router(comments.router, prefix="/api/v1")
-app.include_router(dashboard.router, prefex="/api/v1")
+app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(ws_router)
 
 
