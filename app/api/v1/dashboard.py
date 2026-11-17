@@ -9,12 +9,12 @@ from app.models.group import Group
 from app.models.question import Question
 from app.models.session import Session as SessionModel, SessionStatus
 from app.models.user import User
-from app.schemas.dashboard import DashboardStatsResponse
+from app.schemas.dashboard import DashboardStatResponse
 
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 
-@router.get("/stats", response_model=DashboardStatsResponse)
+@router.get("/stats", response_model=DashboardStatResponse)
 def get_dashboard_stats(
     db: DBSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -36,7 +36,7 @@ def get_dashboard_stats(
     total_attendee_count = db.query(Attendee).filter(Attendee.session_id.in_(session_ids)).count()
     total_question_count = db.query(Question).filter(Question.session_id.in_(session_ids)).count()
 
-    return DashboardStatsResponse(
+    return DashboardStatResponse(
         total_group_count=total_group_count,
         total_session_count=total_session_count,
         total_attendee_count=total_attendee_count,
